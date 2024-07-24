@@ -9,10 +9,13 @@ pipeline {
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
-        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_acesskey')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secretkey')
         AWS_DEFAULT_REGION = 'us-east-1'
-        EC2_INSTANCE_IP = '44.202.219.231'
-        SSH_KEY = credentials('aws_ssh_private') // Updated credentials ID
+        EC2_INSTANCE_ID = 'i-09fe34113de0f983c'
+        EC2_KEY_PAIR_NAME = 'jenkins_trial'
+        LOCAL_JAR_PATH = 'target/demo-0.0.1-SNAPSHOT.jar'
+        REMOTE_JAR_PATH = '/home/ubuntu/demo.jar'
+        SSH_KEY_PATH = 'C:\\path\\to\\your\\jenkins_trial.pem'
     }
 
     stages {
@@ -31,18 +34,17 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    withCredentials([
-                        sshUserPrivateKey(credentialsId: 'aws_ssh_private', keyFileVariable: 'SSH_KEY_PATH')
-                    ]) {
-                        def localPath = 'target/demo-0.0.1-SNAPSHOT.jar' // Adjust to your JAR file name
-                        def remotePath = '/home/ubuntu/demo.jar' // Path on your EC2 instance
+                    def ec2InstanceInfo = bat(script: "aws ec2 describe-instances --instance-ids ${env.EC2_INSTANCE_ID} --query 'Reservations[0].Instances[0].PublicIpAddress' --output text", returnStdout: true).trim()
 
-                        // Copy the artifact to the EC2 instance using SCP
-                        bat "scp -i %SSH_KEY_PATH% ${localPath} ubuntu@${env.EC2_INSTANCE_IP}:${remotePath}"
+                    def remotePath = "${env.REMOTE_JAR_PATH}"
 
-                        // SSH into the EC2 instance and run the application
-                        bat "ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} 'java -jar ${remotePath}'"
-                    }
+                    bat """
+                    scp -i %SSH_KEY_PATH% ${env.LOCAL_JAR_PATH} ubuntu@${ec2InstanceInfo}:${remotePath}
+                    """
+
+                    bat """
+                    ssh -i %SSH_KEY_PATH% ubuntu@${ec2InstanceInfo} "java -jar ${remotePath}"
+                    """
                 }
             }
         }
