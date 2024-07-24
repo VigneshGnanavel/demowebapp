@@ -9,7 +9,7 @@ pipeline {
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
-        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secretkey')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         EC2_INSTANCE_IP = '44.202.219.231'
         SSH_KEY = credentials('aws_ssh_private') // Updated credentials ID
