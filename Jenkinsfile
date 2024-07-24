@@ -36,9 +36,11 @@ pipeline {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: 'demo_web_app_pv', keyFileVariable: 'SSH_KEY_PATH')]) {
                         def remotePath = '/home/ubuntu/demo.jar' 
+
+                        // SSH into the EC2 instance and download the artifact from S3
                         bat """
-                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
-                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
+                        ssh -o StrictHostKeyChecking=no -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
+                        ssh -o StrictHostKeyChecking=no -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
                         """
                     }
                 }
