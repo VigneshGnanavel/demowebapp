@@ -34,15 +34,13 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    withCredentials([
-                        sshUserPrivateKey(credentialsId: 'jenkins_aws_private', keyFileVariable: 'SSH_KEY_PATH')
-                    ]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'jenkins_aws_private', keyFileVariable: 'SSH_KEY_PATH')]) {
                         def remotePath = '/home/ubuntu/demo.jar' // Path on your EC2 instance
 
                         // SSH into the EC2 instance and download the artifact from S3
                         bat """
-                        ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} 'aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}'
-                        ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} 'java -jar ${remotePath}'
+                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
+                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
                         """
                     }
                 }
