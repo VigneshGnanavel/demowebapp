@@ -36,6 +36,9 @@ pipeline {
                      {
                         def localPath = 'target/demo-0.0.1-SNAPSHOT.jar'
                         def remotePath = '/home/ubuntu/demo.jar'
+                         
+                        bat 'aws ec2 describe-instances'
+                         
                         bat "scp -i %SSH_KEY_PATH% ${localPath} ubuntu@${env.EC2_INSTANCE_IP}:${remotePath}"
                       
                         bat "ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} 'java -jar ${remotePath}'"
