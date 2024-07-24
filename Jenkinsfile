@@ -11,7 +11,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         EC2_INSTANCE_IP = '44.202.219.231'
-        SSH_KEY_PATH = 'aws_ssh_private'
+        SSH_KEY_PATH = 'C:\\Users\\Digit\\Downloads\\jenkins_trial.pem'
     }
 
     stages {
