@@ -11,8 +11,8 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         S3_BUCKET_NAME = 'jenkinstrialdemos3'
-        EC2_INSTANCE_IP = '44.202.219.231'
-        SSH_KEY = credentials('jenkins_aws_private')
+        EC2_INSTANCE_IP = '44.211.47.229'
+        SSH_KEY = credentials('demo_web_app_pv')
     }
 
     stages {
@@ -34,7 +34,7 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'jenkins_aws_private', keyFileVariable: 'SSH_KEY_PATH')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'demo_web_app_pv', keyFileVariable: 'SSH_KEY_PATH')]) {
                         def remotePath = '/home/ubuntu/demo.jar' 
                         bat """
                         plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
