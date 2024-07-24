@@ -12,7 +12,7 @@ pipeline {
         AWS_DEFAULT_REGION = 'us-east-1'
         S3_BUCKET_NAME = 'jenkinstrialdemos3'
         EC2_INSTANCE_IP = '44.202.219.231'
-        SSH_KEY = credentials('aws_jenkins_privatekey')
+        SSH_KEY = credentials('jenkins_aws_private')
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        sshUserPrivateKey(credentialsId: 'aws_jenkins_privatekey', keyFileVariable: 'SSH_KEY_PATH')
+                        sshUserPrivateKey(credentialsId: 'jenkins_aws_private', keyFileVariable: 'SSH_KEY_PATH')
                     ]) {
                         def remotePath = '/home/ubuntu/demo.jar' // Path on your EC2 instance
 
