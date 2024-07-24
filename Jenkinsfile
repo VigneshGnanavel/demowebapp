@@ -9,10 +9,10 @@ pipeline {
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
-        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secretkey')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         EC2_INSTANCE_ID = 'i-09fe34113de0f983c'
-        EC2_KEY_PAIR_NAME = 'jenkins_trial'
+        EC2_KEY_PAIR_NAME = 'aws_ssh_private'
         LOCAL_JAR_PATH = 'target/demo-0.0.1-SNAPSHOT.jar'
         REMOTE_JAR_PATH = '/home/ubuntu/demo.jar'
         SSH_KEY_PATH = 'C:\\path\\to\\your\\jenkins_trial.pem'
