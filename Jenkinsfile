@@ -11,7 +11,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         EC2_INSTANCE_IP = '44.202.219.231'
-        SSH_KEY_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\jenkins_trial.pem'
+        SSH_KEY_PATH = 'aws_ssh_private'
     }
 
     stages {
@@ -36,8 +36,6 @@ pipeline {
                      {
                         def localPath = 'target/demo-0.0.1-SNAPSHOT.jar'
                         def remotePath = '/home/ubuntu/demo.jar'
-                         
-                        bat 'aws ec2 describe-instances'
                          
                         bat "scp -i %SSH_KEY_PATH% ${localPath} ubuntu@${env.EC2_INSTANCE_IP}:${remotePath}"
                       
