@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        sshUserPrivateKey(credentialsId: 'jenkins_trial', keyFileVariable: 'SSH_KEY_PATH')
+                        sshUserPrivateKey(credentialsId: 'aws_jenkins_privatekey', keyFileVariable: 'SSH_KEY_PATH')
                     ]) {
                         def remotePath = '/home/ubuntu/demo.jar' // Path on your EC2 instance
 
