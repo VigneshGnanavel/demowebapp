@@ -17,8 +17,8 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    bat 'echo yes | ssh-keyscan %EC2_INSTANCE_IP% >> %USERPROFILE%\\.ssh\\known_hosts'
                     bat "scp -i %SSH_KEY_PATH% target/demo-0.0.1-SNAPSHOT.jar ubuntu@%EC2_INSTANCE_IP%:/home/ubuntu/demo.jar"
+                    bat 'echo yes | ssh-keyscan %EC2_INSTANCE_IP% >> %USERPROFILE%\\.ssh\\known_hosts'
                     bat "ssh -i %SSH_KEY_PATH% ubuntu@%EC2_INSTANCE_IP% 'java -jar /home/ubuntu/demo.jar'"
                 }
             }
