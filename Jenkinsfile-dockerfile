@@ -18,23 +18,6 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/VigneshGnanavel/demowebapp.git'
             }
         }
-        
-        stage('Build') {
-            steps {
-                script {
-                    bat 'mvn clean install'
-                }
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                script {
-                    bat 'mvn test'
-                }
-            }
-        }
-        
         stage('Build Docker Image') {
             steps {
                 script {
