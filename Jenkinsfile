@@ -35,6 +35,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: 'window_secret', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        def localPath = 'target/demo-0.0.1-SNAPSHOT.jar' // Define localPath here as well
                         def remotePath = 'C:\\path\\to\\demo.jar' // Adjust to the correct path on your Windows instance
                         bat """
                         scp -i %SSH_KEY_PATH% ${localPath} Administrator@${env.EC2_INSTANCE_IP}:${remotePath}
