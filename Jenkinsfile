@@ -12,7 +12,7 @@ pipeline {
         AWS_DEFAULT_REGION = 'us-east-1'
         S3_BUCKET_NAME = 'jenkinstrialdemos3'
         EC2_INSTANCE_IP = '54.86.129.41'
-        SSH_KEY = credentials('demo_web_app_pv')
+        SSH_KEY = credentials('window_secret')
     }
 
     stages {
@@ -34,11 +34,11 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    withCredentials([sshUserPrivateKey(credentialsId: 'demo_web_app_pv', keyFileVariable: 'SSH_KEY_PATH')]) {
-                        def remotePath = '/home/ubuntu/demo.jar' 
+                    withCredentials([sshUserPrivateKey(credentialsId: 'window_secret', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        def remotePath = 'C:\\path\\to\\demo.jar' // Adjust to the correct path on your Windows instance
                         bat """
-                        scp -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
-                        ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
+                        scp -i %SSH_KEY_PATH% ${localPath} Administrator@${env.EC2_INSTANCE_IP}:${remotePath}
+                        ssh -i %SSH_KEY_PATH% Administrator@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
                         """
                     }
                 }
