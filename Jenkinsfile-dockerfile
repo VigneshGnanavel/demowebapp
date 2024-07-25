@@ -1,20 +1,15 @@
 pipeline {
     agent any
-
+  
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
     }
-
+  
     environment {
         CI = true
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
-        DOCKER_IMAGE_NAME = 'demowebapp'
-        DOCKER_IMAGE_TAG = 'latest'
-        PORT = '8088'
-        SNYK_TAG = 'latest'
-        SNYK_API_TOKEN = credentials('snyk_test')
     }
 
     stages {
@@ -27,7 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t ${env.DOCKER_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG} ."
+                    bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
         }
@@ -35,29 +30,28 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    bat "docker run -d -p ${env.PORT}:${env.PORT} --name mydemowebapp ${env.DOCKER_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG}"
+                    bat "docker run -d -p ${PORT}:${PORT} --name mydemowebapp ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                 }
             }
         }
 
-        stage('Run Snyk in Docker') {
+        stage('Snyk Security Testing') {
             steps {
                 script {
-                    bat "docker pull snyk/snyk-cli:${env.SNYK_TAG}"
-                    bat 'docker run --rm -e SNYK_TOKEN=${env.SNYK_API_TOKEN} -v %CD%:/project snyk/snyk-cli:${env.SNYK_TAG} snyk test --all-projects --json > snyk_junit_report.json'
+                    withCredentials([string(credentialsId: 'snyk_test', variable: 'SNYK_API_TOKEN')]) {
+                        bat "snyk auth ${env.SNYK_API_TOKEN}"
+                        bat "snyk test --all-projects --json > snyk_junit_report.json"
+                    }
                 }
             }
         }
         
         stage('Generate SBOM') {
             steps {
-                script {
-                    bat 'docker pull anchore/syft:latest'
-                    bat 'docker run --rm -v %CD%:/project anchore/syft:latest packages dir:/project --scope AllLayers -o json > java_syft_junit_sbom.json'
-                }
+                bat 'syft packages dir:. --scope AllLayers -o json > ./java_syft_junit_sbom.json'
             }
         }
-
+        
         stage('Upload Test Results to Artifactory') {
             steps {
                 script {
