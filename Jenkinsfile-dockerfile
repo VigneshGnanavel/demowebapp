@@ -18,6 +18,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/VigneshGnanavel/demowebapp.git'
             }
         }
+        
         stage('Build Docker Image') {
             steps {
                 script {
@@ -30,6 +31,14 @@ pipeline {
             steps {
                 script {
                     bat "docker run -d -p ${PORT}:${PORT} --name mydemowebapp ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Install Snyk CLI') {
+            steps {
+                script {
+                    bat 'npm install -g snyk'
                 }
             }
         }
@@ -54,10 +63,10 @@ pipeline {
         stage('Upload Test Results to Artifactory') {
             steps {
                 script {
-                    bat 'dir target\\surefire-reports'
-                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/surefire-reports/TEST-calculatorTest.xml results/"
-                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} java_syft_junit_sbom.json web-app-artifactory/"
-                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} snyk_junit_report.json web-app-artifactory/"
+                    bat 'dir target\\surefire-reports || true'
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} target/surefire-reports/TEST-calculatorTest.xml results/ || true"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} java_syft_junit_sbom.json web-app-artifactory/ || true"
+                    bat "jf rt upload --url http://172.17.208.1:8082/artifactory/ --access-token ${env.ARTIFACTORY_ACCESS_TOKEN} snyk_junit_report.json web-app-artifactory/ || true"
                 }
             }
         }
