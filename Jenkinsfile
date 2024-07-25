@@ -11,7 +11,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_acesskey')
         AWS_DEFAULT_REGION = 'us-east-1'
         S3_BUCKET_NAME = 'jenkinstrialdemos3'
-        EC2_INSTANCE_IP = '44.211.47.229'
+        EC2_INSTANCE_IP = '54.86.129.41'
         SSH_KEY = credentials('demo_web_app_pv')
     }
 
@@ -37,8 +37,8 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: 'demo_web_app_pv', keyFileVariable: 'SSH_KEY_PATH')]) {
                         def remotePath = '/home/ubuntu/demo.jar' 
                         bat """
-                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
-                        plink -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
+                        scp -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "aws s3 cp s3://${env.S3_BUCKET_NAME}/demo.jar ${remotePath}"
+                        ssh -i %SSH_KEY_PATH% ubuntu@${env.EC2_INSTANCE_IP} "java -jar ${remotePath}"
                         """
                     }
                 }
