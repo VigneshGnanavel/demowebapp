@@ -1,15 +1,18 @@
 pipeline {
     agent any
-  
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
     }
-  
+
     environment {
         CI = true
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
+        DOCKER_IMAGE_NAME = 'demowebapp'
+        DOCKER_IMAGE_TAG = 'latest'
+        PORT = '8088'
     }
 
     stages {
@@ -18,7 +21,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/VigneshGnanavel/demowebapp.git'
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -26,7 +29,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Run Docker Container') {
             steps {
                 script {
@@ -45,13 +48,13 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Generate SBOM') {
             steps {
                 bat 'syft packages dir:. --scope AllLayers -o json > ./java_syft_junit_sbom.json'
             }
         }
-        
+
         stage('Upload Test Results to Artifactory') {
             steps {
                 script {
