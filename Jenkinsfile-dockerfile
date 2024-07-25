@@ -10,6 +10,9 @@ pipeline {
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
         JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-11.0.23.9-hotspot'
         PATH = "${env.JAVA_HOME}\\bin;${env.PATH}"
+        DOCKER_IMAGE_NAME = 'demowebapp'
+        DOCKER_IMAGE_TAG = 'latest'
+        PORT = '8088'
     }
 
     stages {
@@ -22,7 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    bat "docker build -t ${env.DOCKER_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG} ."
                 }
             }
         }
@@ -30,7 +33,7 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 script {
-                    bat "docker run -d -p ${PORT}:${PORT} --name mydemowebapp ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    bat "docker run -d -p ${env.PORT}:${env.PORT} --name mydemowebapp ${env.DOCKER_IMAGE_NAME}:${env.DOCKER_IMAGE_TAG}"
                 }
             }
         }
