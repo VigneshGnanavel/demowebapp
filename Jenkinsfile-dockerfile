@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE_NAME = 'demowebapp'
+        DOCKER_IMAGE_TAG = 'latest'
+        PORT = '8088'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from Git repository
+                git 'https://github.com/VigneshGnanavel/demowebapp.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                // Build the Maven project
+                script {
+                    bat 'mvn clean install'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                // Build the Docker image
+                script {
+                    bat "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                }
+            }
+        }
+        
+        stage('Run Docker Container') {
+            steps {
+                // Run the Docker container
+                script {
+                    bat "docker run -d -p ${PORT}:${PORT} --name mydemowebapp ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            bat 'docker stop mydemowebapp || true'
+            bat 'docker rm mydemowebapp || true'
+        }
+    }
+}
