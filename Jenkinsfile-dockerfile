@@ -10,8 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from Git repository
-                git 'https://github.com/VigneshGnanavel/demowebapp.git'
+                git branch: 'main', url:'https://github.com/VigneshGnanavel/demowebapp.git'
             }
         }
         
